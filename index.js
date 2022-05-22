@@ -23,7 +23,7 @@ async function run(){
         await client.connect();
         console.log("Mongo is connected to HUNK");
 
-        const toolsCollection=client.db("PC_Hunk").collection("Pc_Parts");
+        const toolsCollection=client.db("PC_Hunk").collection("tools");
 
         //Api for loading all pc-parts
         app.get('/tools',async(req,res)=>{
