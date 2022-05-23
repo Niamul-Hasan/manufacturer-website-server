@@ -34,9 +34,15 @@ async function run(){
 
         //Api for inserting reviews into db
         app.post('/reviews',async(req,res)=>{
-            const query=req.body;
-            const reviews= await reviewCollection.insertOne(query);
-            res.send({success:reviews})
+            const data=req.body;
+            const reviews= await reviewCollection.insertOne(data);
+            res.send({success:true,reviews});
+        })
+
+        //Api for loading Recent reviews for homepage
+        app.get('/reviews',async(req,res)=>{
+            const review=await reviewCollection.find({}).sort({$natural:-1}).toArray()
+            res.send(review);
         })
     }
     finally{
