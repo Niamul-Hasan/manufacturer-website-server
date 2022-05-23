@@ -24,11 +24,19 @@ async function run(){
         console.log("Mongo is connected to HUNK");
 
         const toolsCollection=client.db("PC_Hunk").collection("tools");
+        const reviewCollection=client.db("PC_Hunk").collection("reviews");
 
         //Api for loading all pc-parts
         app.get('/tools',async(req,res)=>{
             const tools=await toolsCollection.find().toArray();
             res.send(tools)
+        })
+
+        //Api for inserting reviews into db
+        app.post('/reviews',async(req,res)=>{
+            const query=req.body;
+            const reviews= await reviewCollection.insertOne(query);
+            res.send({success:reviews})
         })
     }
     finally{
