@@ -4,7 +4,7 @@ const cors=require('cors')
 const port = process.env.PORT||4000;
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 //middleware
 app.use(cors());
@@ -31,6 +31,20 @@ async function run(){
         app.get('/tools',async(req,res)=>{
             const tools=await toolsCollection.find().toArray();
             res.send(tools)
+        })
+
+        //Api for Updating All pc-parts
+        app.put('/tools/:id',async(req,res)=>{
+            const id=req.params.id;
+            const filter={_id:ObjectId(id)};
+            const options={upsert:true};
+            const update=req.body;
+            const updatedDoc = {
+                $set: update
+              };
+              const result= await toolsCollection.updateOne(filter,updatedDoc,options);
+              res.send(result);
+
         })
 
         //Api for inserting reviews into db
@@ -60,7 +74,7 @@ async function run(){
         res.send({result,token});
       });
 
-      
+
     }
     finally{
 
