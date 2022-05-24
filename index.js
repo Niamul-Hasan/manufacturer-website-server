@@ -41,6 +41,7 @@ async function run(){
         const toolsCollection=client.db("PC_Hunk").collection("tools");
         const reviewCollection=client.db("PC_Hunk").collection("reviews");
         const userCollection=client.db("PC_Hunk").collection("users");
+        const orderCollection=client.db("PC_Hunk").collection("orders");
 
         //Api for loading all pc-parts
         app.get('/tools',async(req,res)=>{
@@ -95,6 +96,13 @@ async function run(){
         const token = jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '7d' });
         res.send({result,token});
       });
+
+      //Api for inserting oders into db
+      app.post('/orders',async(req,res)=>{
+        const product=req.body;
+        const order=await orderCollection.insertOne(product);
+        req.send(order);
+      })
 
 
     }
