@@ -97,11 +97,43 @@ async function run(){
         res.send({result,token});
       });
 
+      //Api for loading all users
+      app.get('/user',verifyJwt,async(req,res)=>{
+        const users=await userCollection.find().toArray();
+        res.send(users);
+      })
+
+         //Api for making an user to admin
+         app.put("/user/admin/:email",verifyJwt,async(req,res)=>{
+          const email=req.params.email;
+          const initiator=req?.decoded.email;
+
+        const initiatorAccount=await userCollection.findOne({email:initiator});
+          if(initiatorAccount.role==="Admin"){
+            const filter={email:email};
+            const updateDoc = {
+              $set:{
+                role:'Admin'
+              }
+            };
+            const result= await userCollection.updateOne(filter,updateDoc);
+           return res.send(result);
+          }
+         else{
+          return res.status(403).send({message:'Forbidden'});
+         }
+        });
+
       //Api for inserting oders into db
       app.post('/orders',async(req,res)=>{
         const product=req.body;
         const order=await orderCollection.insertOne(product);
-        req.send(order);
+        res.send(order);
+      })
+      //Api for loading all orders
+      app.get('/orders',async(req,res)=>{
+        const orders=await orderCollection.find().toArray();
+        res.send(orders);
       })
 
 
