@@ -5,6 +5,7 @@ const port = process.env.PORT||4000;
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const stripe= require('stripe')(process.env.STRIPE_KEY);
 
 //middleware
 app.use(cors());
@@ -42,6 +43,7 @@ async function run(){
         const reviewCollection=client.db("PC_Hunk").collection("reviews");
         const userCollection=client.db("PC_Hunk").collection("users");
         const orderCollection=client.db("PC_Hunk").collection("orders");
+        const paymentCollection=client.db("PC_Hunk").collection("payments");
 
         //Api for loading all pc-parts
         app.get('/tools',async(req,res)=>{
@@ -159,6 +161,43 @@ async function run(){
           }
             
         });
+
+        //Api for loading selected order info to pay
+        app.get('/myorder/:id',verifyJwt,async(req,res)=>{
+          const id=req.params.id;
+          const query={_id:ObjectId(id)};
+          const orderInfo=await orderCollection.findOne(query);
+          res.send(orderInfo);
+        });
+
+         // Api for payment collection and confirm payment 
+      app.patch('/myorder/:id',verifyJwt,async(req,res)=>{
+        const id=req.params.id;
+        const filter={_id:ObjectId(id)};
+        const paymentinfo=req.body;
+        const updatedDoc={
+          $set:{
+            paid:true,
+            transactionId:paymentinfo.transactionId,
+          }
+        }
+        const orderUpdate=await orderCollection.updateOne(filter,updatedDoc);
+        const payment=await paymentCollection.insertOne(paymentinfo);
+        res.send({Update:orderUpdate,Payment:payment});
+      });
+
+       //api for stripe payment 
+       app.post("/create-payment-intent", async (req, res)=>{
+        const order=req.body;
+        const price=order.duePrice;
+        const amount=price*100;
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount:amount,
+          currency:'usd',
+          payment_method_types: ["card"],
+        });
+        res.send({clientSecret: paymentIntent.client_secret});
+      })
 
 
     }
