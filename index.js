@@ -44,6 +44,7 @@ async function run(){
         const userCollection=client.db("PC_Hunk").collection("users");
         const orderCollection=client.db("PC_Hunk").collection("orders");
         const paymentCollection=client.db("PC_Hunk").collection("payments");
+        const profileCollection=client.db("PC_Hunk").collection("profiles");
 
         //Api for loading all pc-parts
         app.get('/tools',async(req,res)=>{
@@ -70,6 +71,32 @@ async function run(){
             const filter={_id:ObjectId(id)};
             const result=await toolsCollection.findOne(filter);
             res.send(result);
+        })
+
+        //Api for inserting profile into db
+        app.post('/profile',async(req,res)=>{
+          const data=req.body;
+          const profile=await profileCollection.insertOne(data);
+          res.send(profile);
+        })
+        //Api for loading a profile
+        app.get('/profile/:email',async(req,res)=>{
+          const email=req.params.email;
+          const filter={email:email};
+          const myprofile=await profileCollection.findOne(filter);
+          res.send(myprofile);
+        })
+        //Api for updating profile into db
+        app.put('/profile/:email',verifyJwt,async(req,res)=>{
+          const email=req.params.email;
+          const filter={email:email};
+          const option={upsert:true};
+          const data=req.body;
+          const updateDoc = {
+            $set: data
+          };
+          const updateProfile=await profileCollection.updateOne(filter,updateDoc,option);
+          res.send(updateProfile);
         })
 
         //Api for inserting reviews into db
