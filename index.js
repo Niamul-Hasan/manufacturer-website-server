@@ -108,7 +108,7 @@ async function run(){
           const email=req.params.email;
           const initiator=req?.decoded.email;
 
-        const initiatorAccount=await userCollection.findOne({email:initiator});
+          const initiatorAccount=await userCollection.findOne({email:initiator});
           if(initiatorAccount.role==="Admin"){
             const filter={email:email};
             const updateDoc = {
@@ -124,6 +124,14 @@ async function run(){
          }
         });
 
+      //Api for verify admin
+      app.get('/admin/:email',verifyJwt,async(req,res)=>{
+        const email=req.params.email;
+        const user=await userCollection.findOne({email:email});
+        const isAdmin=user.role==="Admin";
+        res.send({admin:isAdmin});
+      })
+
       //Api for inserting oders into db
       app.post('/orders',async(req,res)=>{
         const product=req.body;
@@ -135,6 +143,22 @@ async function run(){
         const orders=await orderCollection.find().toArray();
         res.send(orders);
       })
+
+         //Api for loading myOrders filtering by email to dashboard
+         app.get('/myorder',verifyJwt,async(req,res)=>{
+          const getEmail=req.query.email;
+          const decodedEmail=req?.decoded.email;
+
+          if(decodedEmail===getEmail){
+            const query={email:getEmail};
+            const myorder= await orderCollection.find(query).toArray();
+            return res.send(myorder);
+          }
+          else{
+            return res.status(403).send({message:'Forbidden User'})
+          }
+            
+        });
 
 
     }
