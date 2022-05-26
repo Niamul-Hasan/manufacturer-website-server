@@ -52,6 +52,14 @@ async function run(){
             res.send(tools)
         })
 
+        //Api for add a product
+        app.put('/tools',async(req,res)=>{
+          const body=req.body;
+          const tools=await toolsCollection.insertOne(body);
+          res.send(tools)
+      })
+
+
         //Api for Updating All pc-parts
         app.put('/tools/:id',async(req,res)=>{
             const id=req.params.id;
