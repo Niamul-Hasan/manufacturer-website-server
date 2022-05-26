@@ -121,6 +121,7 @@ async function run(){
         })
 
           //Api for upsert login data into user db
+
       app.put("/user/:email",async(req,res)=>{
         const email=req.params.email;
         const filter={email:email};
@@ -138,6 +139,14 @@ async function run(){
       app.get('/user',verifyJwt,async(req,res)=>{
         const users=await userCollection.find().toArray();
         res.send(users);
+      })
+
+      //Api for delete a user
+      app.delete('/user/:email',verifyJwt,async(req,res)=>{
+        const email=req.params.email;
+        const filter={email:email};
+        const removeUser=await userCollection.deleteOne(filter);
+        res.send(removeUser);
       })
 
          //Api for making an user to admin
@@ -175,6 +184,14 @@ async function run(){
         const order=await orderCollection.insertOne(product);
         res.send(order);
       })
+        //Api for deleting Order
+        app.delete('/order/:id',async(req,res)=>{
+          const id=req.params.id;
+          const filter={_id:ObjectId(id)};
+          const removedata=await orderCollection.deleteOne(filter);
+          res.send(removedata);
+        })
+
       //Api for loading all orders
       app.get('/orders',async(req,res)=>{
         const orders=await orderCollection.find().toArray();
