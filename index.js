@@ -193,7 +193,7 @@ async function run(){
         })
 
       //Api for loading all orders
-      app.get('/orders',async(req,res)=>{
+      app.get('/orders',verifyJwt,async(req,res)=>{
         const orders=await orderCollection.find().toArray();
         res.send(orders);
       })
