@@ -262,7 +262,7 @@ run().catch(console.dir);
 
 
 app.get("/",(req,res)=>{
-    res.send("PC_HUNK IS CONNECED....WITH SERVER");
+    res.send("PC_HUNK IS CONNECED....Now it is working with cyclick");
 })
 
 app.listen(port, () => {
