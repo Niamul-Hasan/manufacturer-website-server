@@ -36,7 +36,7 @@ const verifyJwt=(req,res,next)=>{
 
 async function run(){
     try{
-        await client.connect();
+         client.connect();
         console.log("Mongo is connected to HUNK");
 
         const toolsCollection=client.db("PC_Hunk").collection("tools");
@@ -262,7 +262,7 @@ run().catch(console.dir);
 
 
 app.get("/",(req,res)=>{
-    res.send("PC_HUNK IS CONNECED....Now it is working with cyclick");
+    res.send("PC_HUNK IS CONNECED....Now it is working with vercel");
 })
 
 app.listen(port, () => {
